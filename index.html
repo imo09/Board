@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; font-src data:; style-src 'unsafe-inline'; script-src 'sha256-mV0DdlEp0MOFgk2HkT6z2jFtIIiA6dj7r7y6CNwc5oI='; connect-src 'self'; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
+<title>[board]</title>
+<meta name="description" content="Tutte le app nautargo in un posto solo.">
+<meta name="theme-color" content="#F4ECE0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#171C22" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icone/board-180.png">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20512%20512%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22carta%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%220%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%23FBF7F1%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23EEE2CF%22%2F%3E%3C%2FlinearGradient%3E%3CradialGradient%20id%3D%22tramonto%22%20cx%3D%22.5%22%20cy%3D%221.02%22%20r%3D%22.62%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%23DD7A3B%22%20stop-opacity%3D%22.26%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23DD7A3B%22%20stop-opacity%3D%220%22%2F%3E%3C%2FradialGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%22512%22%20height%3D%22512%22%20fill%3D%22url%28%23carta%29%22%2F%3E%3Crect%20width%3D%22512%22%20height%3D%22512%22%20fill%3D%22url%28%23tramonto%29%22%2F%3E%3Crect%20x%3D%22138.0%22%20y%3D%2298.0%22%20width%3D%22236.0%22%20height%3D%22316.0%22%20rx%3D%2240.0%22%20fill%3D%22none%22%20stroke%3D%22%232B3036%22%20stroke-width%3D%2217.0%22%2F%3E%3Cg%20transform%3D%22translate%28189.73%20149.00%29%20scale%280.63881%29%20translate%28-300%20-85%29%22%3E%3Cpath%20d%3D%22M475.937%2098.7457L452.965%20215.21L351.835%20240.434Z%22%20fill%3D%22%232B3840%22%2F%3E%3Cpath%20d%3D%22M452.945%20215.214L351.845%20240.423L408.472%20267.511Z%22%20fill%3D%22%23263039%22%2F%3E%3Cpath%20d%3D%22M351.84%20240.421L407.127%20266.797L335.389%20347.492Z%22%20fill%3D%22%232F3A40%22%2F%3E%3Cpath%20d%3D%22M438.972%20261.011L452.957%20215.21L491.352%20298.816Z%22%20fill%3D%22%232D3A42%22%2F%3E%3Cpath%20d%3D%22M335.397%20347.455L377.479%20344.597L459.711%20301.475L438.972%20261.011Z%22%20fill%3D%22%23242F37%22%2F%3E%3Cpath%20d%3D%22M335.386%20347.489L438.972%20261.011L452.961%20215.198Z%22%20fill%3D%22%233F484F%22%2F%3E%3Cpath%20d%3D%22M459.695%20301.468L491.357%20298.844L438.98%20261.015Z%22%20fill%3D%22%233F484E%22%2F%3E%3Cpath%20d%3D%22M311.404%20363.14L392.687%20408.599L381.125%20357.818Z%22%20fill%3D%22%23CB763F%22%2F%3E%3Cpath%20d%3D%22M392.678%20408.589L418.308%20408.507L503.519%20311.874L463.239%20314.994L381.119%20357.813Z%22%20fill%3D%22%23D07C49%22%2F%3E%3Cpath%20d%3D%22M507.958%20359.386L503.521%20311.871L418.301%20408.507Z%22%20fill%3D%22%23C06A37%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
+<style>
+@font-face{font-family:"Poppins nautargo";font-weight:600;font-display:block;
+  src:url(data:font/woff2;base64,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) format("woff2")}
+:root{
+  --carta:#F4ECE0; --inchiostro:#2B3036; --tenue:#5B636D; --bordo:rgba(43,48,54,.10);
+  --ombra:0 1px 2px rgba(43,48,54,.10),0 6px 18px rgba(43,48,54,.10); --accento:#C96A2F;
+  --marchio:"Poppins nautargo",system-ui,sans-serif;
+  color-scheme:light dark;
+}
+@media (prefers-color-scheme:dark){
+  :root{--carta:#171C22; --inchiostro:#F4EFE8; --tenue:#9AA3AF; --bordo:rgba(255,255,255,.09);
+    --ombra:0 1px 2px rgba(0,0,0,.30),0 6px 18px rgba(0,0,0,.25); --accento:#E8A867}
+  .vela{filter:brightness(2.1)}
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--carta);color:var(--inchiostro)}
+body{font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;
+  min-height:100dvh;display:flex;flex-direction:column;
+  padding:calc(env(safe-area-inset-top) + 14px) calc(env(safe-area-inset-right) + 16px)
+          calc(env(safe-area-inset-bottom) + 18px) calc(env(safe-area-inset-left) + 16px);
+  -webkit-tap-highlight-color:transparent}
+.colonna{width:100%;max-width:520px;margin:0 auto;flex:1;display:flex;flex-direction:column}
+header{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:44px}
+.nautargo{display:flex;align-items:center;gap:10px}
+.nautargo svg{width:22px;height:34px;display:block;flex:none}
+.marchio{font-family:var(--marchio);font-weight:600;font-size:23px;letter-spacing:-.01em;line-height:1}
+.titolo{font-family:var(--marchio);font-weight:600;font-size:17px;letter-spacing:-.01em;line-height:1;white-space:nowrap}
+.titolo span{color:var(--accento)}
+main{padding-top:30px}
+.app-griglia{list-style:none;display:grid;grid-template-columns:repeat(4,1fr);gap:22px 8px}
+.app{display:flex;flex-direction:column;align-items:center;gap:9px;text-decoration:none;color:inherit;
+  border-radius:18px;padding:4px 0;outline:none}
+.app::after{content:"";width:5px;height:5px;margin-top:-3px;border-radius:50%}
+.app.ultima::after{background:var(--accento)}
+.ico{width:min(68px,100%);aspect-ratio:1;border-radius:23%;overflow:hidden;box-shadow:var(--ombra),0 0 0 1px var(--bordo);
+  transition:transform .14s ease}
+.ico svg,.ico img{width:100%;height:100%;display:block}
+.nm{font-family:var(--marchio);font-weight:600;font-size:15px;line-height:1.1;letter-spacing:-.01em}
+.app:active .ico{transform:scale(.93)}
+.app:focus-visible .ico{box-shadow:0 0 0 3px var(--carta),0 0 0 5px var(--accento)}
+@media (hover:hover){.app:hover .ico{transform:translateY(-2px)}}
+.avviso{margin-top:34px;padding:14px 16px;border-radius:14px;box-shadow:0 0 0 1px var(--bordo);
+  font-size:14px;color:var(--tenue);display:flex;gap:12px;align-items:flex-start}
+.avviso[hidden]{display:none}
+.avviso p{flex:1}
+.avviso button{font:inherit;font-size:14px;font-weight:600;color:var(--inchiostro);background:none;border:0;
+  padding:2px 0;cursor:pointer;white-space:nowrap}
+footer{margin-top:auto;padding-top:40px;text-align:center;font-size:13px;color:var(--tenue)}
+footer a{color:inherit;text-underline-offset:3px}
+/* telefoni: la barra si stringe un poco perché [board] resti al centro senza toccare nautargo */
+@media (max-width:409px){.marchio{font-size:21px} .nautargo{gap:9px} .nautargo svg{width:20px;height:31px} .titolo{font-size:16px}}
+@media (max-width:374px){.marchio{font-size:18px} .nautargo{gap:7px} .nautargo svg{width:18px;height:28px} .titolo{font-size:15px}}
+@media (max-width:339px){.marchio{font-size:17px} .nautargo{gap:6px} .nautargo svg{width:16px;height:25px} .titolo{font-size:14px}}
+@media (max-width:319px){.app-griglia{grid-template-columns:repeat(3,1fr)}}
+@media (min-width:700px){body{padding-top:48px} main{padding-top:44px} .ico{width:76px}}
+</style>
+</head>
+<body>
+<div class="colonna">
+
+<header>
+  <div class="nautargo">
+    <svg viewBox="300 85 220 335" aria-hidden="true">
+      <g class="vela">
+        <path d="M475.937 98.7457L452.965 215.21L351.835 240.434Z" fill="#2B3840"/>
+        <path d="M452.945 215.214L351.845 240.423L408.472 267.511Z" fill="#263039"/>
+        <path d="M351.84 240.421L407.127 266.797L335.389 347.492Z" fill="#2F3A40"/>
+        <path d="M438.972 261.011L452.957 215.21L491.352 298.816Z" fill="#2D3A42"/>
+        <path d="M335.397 347.455L377.479 344.597L459.711 301.475L438.972 261.011Z" fill="#242F37"/>
+        <path d="M335.386 347.489L438.972 261.011L452.961 215.198Z" fill="#3F484F"/>
+        <path d="M459.695 301.468L491.357 298.844L438.98 261.015Z" fill="#3F484E"/>
+      </g>
+      <path d="M311.404 363.14L392.687 408.599L381.125 357.818Z" fill="#CB763F"/>
+      <path d="M392.678 408.589L418.308 408.507L503.519 311.874L463.239 314.994L381.119 357.813Z" fill="#D07C49"/>
+      <path d="M507.958 359.386L503.521 311.871L418.301 408.507Z" fill="#C06A37"/>
+    </svg>
+    <div class="marchio">nautargo</div>
+  </div>
+  <h1 class="titolo"><span>[</span>board<span>]</span></h1>
+</header>
+
+<main>
+  <!-- Un blocco <li> per app: data-app (nome breve), indirizzo, icona, nome. Per aggiungerne una, copia un blocco e cambialo. -->
+  <ul class="app-griglia">
+
+    <li><a class="app" data-app="sero" href="https://sero.nautargo.com/">
+      <span class="ico"><svg viewBox="4 4 64 64" aria-hidden="true" fill="none">
+        <rect x="4" y="4" width="64" height="64" fill="#2B3036"/>
+        <rect x="16" y="20" width="40" height="38" rx="9" stroke="#ECE1D1" stroke-width="4"/>
+        <path d="M26 20V12h20v8" stroke="#ECE1D1" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M28 40l7 7 12-14" stroke="#DD7A3B" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg></span>
+      <span class="nm">sero</span>
+    </a></li>
+
+    <li><a class="app" data-app="sestante" href="https://sestante.nautargo.com/">
+      <span class="ico"><svg viewBox="4 4 64 64" aria-hidden="true">
+        <defs><clipPath id="sestanteTaglio"><rect x="4" y="4" width="64" height="64"/></clipPath></defs>
+        <rect x="4" y="4" width="64" height="64" fill="#0E1D2A"/>
+        <circle cx="46" cy="27" r="11" fill="#E8A867" opacity=".2"/>
+        <circle cx="46" cy="27" r="4.5" fill="#E8A867"/>
+        <g clip-path="url(#sestanteTaglio)"><path d="M-4 54 C 18 42, 46 42, 76 52 L76 80 L-4 80 Z" fill="#E9EDEC"/></g>
+      </svg></span>
+      <span class="nm">sestante</span>
+    </a></li>
+
+    <li><a class="app" data-app="folio" href="https://folio.nautargo.com/">
+      <span class="ico"><svg viewBox="4 4 64 64" aria-hidden="true">
+        <rect x="4" y="4" width="64" height="64" fill="#2A2621"/>
+        <g fill="none" stroke="#F6F0E3" stroke-linecap="round" stroke-linejoin="round">
+          <path stroke-width="5.5" d="M33.06 52V31a7.5 7.5 0 0 1 7.5-7.5h2.2"/>
+          <path stroke-width="4.75" d="M33.06 34.6h5.8"/>
+        </g>
+        <circle cx="42.8" cy="51.9" r="2.7" fill="#8F5F22"/>
+      </svg></span>
+      <span class="nm">folio</span>
+    </a></li>
+
+    <li><a class="app" data-app="lare" href="https://lare.nautargo.com/">
+      <span class="ico"><img alt="" src="data:image/png;base64,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"></span>
+      <span class="nm">lare</span>
+    </a></li>
+
+    <li><a class="app" data-app="teca" href="https://teca.nautargo.com/">
+      <span class="ico"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><defs><linearGradient id="tecaFondo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#18334B"/><stop offset="1" stop-color="#0B1824"/></linearGradient></defs><rect width="512" height="512" fill="url(#tecaFondo)"/><g transform="translate(56.00 171.55) scale(0.15134) translate(223.0 899.0)"><rect x="-185.0" y="-861.0" width="2567.0" height="1040.0" rx="220" fill="none" stroke="#E8A867" stroke-width="76"/><path d="M232 -439V-171Q232 -143 245.5 -130.5Q259 -118 291 -118H356V0H268Q91 0 91 -172V-439H25V-554H91V-691H232V-554H356V-439ZM953.0 -235H548.0Q553.0 -175 590.0 -141.0Q627.0 -107 681.0 -107Q759.0 -107 792.0 -174H943.0Q919.0 -94 851.0 -42.5Q783.0 9 684.0 9Q604.0 9 540.5 -26.5Q477.0 -62 441.5 -127.0Q406.0 -192 406.0 -277Q406.0 -363 441.0 -428.0Q476.0 -493 539.0 -528.0Q602.0 -563 684.0 -563Q763.0 -563 825.5 -529.0Q888.0 -495 922.5 -432.5Q957.0 -370 957.0 -289Q957.0 -259 953.0 -235ZM812.0 -329Q811.0 -383 773.0 -415.5Q735.0 -448 680.0 -448Q628.0 -448 592.5 -416.5Q557.0 -385 549.0 -329ZM1282.0 -563Q1385.0 -563 1452.5 -511.5Q1520.0 -460 1543.0 -367H1392.0Q1380.0 -403 1351.5 -423.5Q1323.0 -444 1281.0 -444Q1221.0 -444 1186.0 -400.5Q1151.0 -357 1151.0 -277Q1151.0 -198 1186.0 -154.5Q1221.0 -111 1281.0 -111Q1366.0 -111 1392.0 -187H1543.0Q1520.0 -97 1452.0 -44.0Q1384.0 9 1282.0 9Q1202.0 9 1140.0 -26.5Q1078.0 -62 1043.0 -126.5Q1008.0 -191 1008.0 -277Q1008.0 -363 1043.0 -427.5Q1078.0 -492 1140.0 -527.5Q1202.0 -563 1282.0 -563ZM1848.0 -563Q1910.0 -563 1956.5 -538.0Q2003.0 -513 2031.0 -475V-554H2172.0V0H2031.0V-81Q2004.0 -42 1956.5 -16.5Q1909.0 9 1847.0 9Q1777.0 9 1719.5 -27.0Q1662.0 -63 1628.5 -128.5Q1595.0 -194 1595.0 -279Q1595.0 -363 1628.5 -428.0Q1662.0 -493 1719.5 -528.0Q1777.0 -563 1848.0 -563ZM1884.0 -440Q1845.0 -440 1812.0 -421.0Q1779.0 -402 1758.5 -365.5Q1738.0 -329 1738.0 -279Q1738.0 -229 1758.5 -191.5Q1779.0 -154 1812.5 -134.0Q1846.0 -114 1884.0 -114Q1923.0 -114 1957.0 -133.5Q1991.0 -153 2011.0 -189.5Q2031.0 -226 2031.0 -277Q2031.0 -328 2011.0 -364.5Q1991.0 -401 1957.0 -420.5Q1923.0 -440 1884.0 -440Z" fill="#E9EDEC"/></g></svg></span>
+      <span class="nm">teca</span>
+    </a></li>
+
+  </ul>
+
+  <div class="avviso" id="avviso" hidden>
+    <p data-en="On iPhone, installed apps open from the Home Screen. From here you get their browser version, which keeps separate data.">Su iPhone le app installate si aprono dalla schermata Home. Da qui si apre la loro versione nel browser, che tiene dati separati.</p>
+    <button type="button" id="chiudiAvviso" data-en="Got it">Ho capito</button>
+  </div>
+</main>
+
+<footer>[board] 1.1 - <a href="https://nautargo.com/">nautargo.com</a></footer>
+
+</div>
+<script>
+(function () {
+  function leggi(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function scrivi(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  function app(nome) { return /^[a-z]+$/.test(nome || '') ? document.querySelector('.app[data-app="' + nome + '"]') : null; }
+
+  // Scorciatoie dalla pressione lunga sull'icona: ?apri=folio porta subito a folio
+  var scorciatoia = app(new URLSearchParams(location.search).get('apri'));
+  if (scorciatoia) { scrivi('board.ultima', scorciatoia.dataset.app); location.replace(scorciatoia.href); return; }
+
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function () {});
+
+  // Lingua: italiano se il dispositivo e' in italiano, altrimenti inglese
+  if (!/^it\b/i.test(navigator.language || 'it')) {
+    document.documentElement.lang = 'en';
+    document.querySelectorAll('[data-en]').forEach(function (n) { n.textContent = n.getAttribute('data-en'); });
+  }
+
+  // Ultima app aperta: un punto sotto il nome
+  function segna(nome) {
+    document.querySelectorAll('.app').forEach(function (a) { a.classList.toggle('ultima', a.dataset.app === nome); });
+  }
+  segna(leggi('board.ultima'));
+  document.querySelector('.app-griglia').addEventListener('click', function (e) {
+    var a = e.target.closest('.app');
+    if (!a) return;
+    scrivi('board.ultima', a.dataset.app);
+    segna(a.dataset.app);
+  });
+
+  // Avviso su iPhone e iPad, finche' non si tocca "Ho capito"
+  var ios = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (!ios || leggi('board.avvisoIos') === '1') return;
+  var avviso = document.getElementById('avviso');
+  avviso.hidden = false;
+  document.getElementById('chiudiAvviso').onclick = function () {
+    avviso.hidden = true;
+    scrivi('board.avvisoIos', '1');
+  };
+})();
+</script>
+</body>
+</html>

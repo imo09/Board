@@ -1,7 +1,7 @@
 // board: si apre subito dalla copia salvata e intanto scarica quella nuova.
 // Una modifica a index.html arriva da sola all'apertura successiva.
-const CACHE = 'board-2';
-const FILE = ['./', 'manifest.webmanifest', 'icone/board-180.png', 'icone/board-192.png', 'icone/board-512.png'];
+const CACHE = 'board-3';
+const FILE = ['./', 'board.js', 'manifest.webmanifest', 'icone/board-180.png', 'icone/board-192.png', 'icone/board-512.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE)

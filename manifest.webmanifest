@@ -2,7 +2,7 @@
   "id": "/",
   "name": "[board]",
   "short_name": "[board]",
-  "description": "Tutte le app nautargo in un posto solo.",
+  "description": "Tutte le app e le skill nautargo in un posto solo.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

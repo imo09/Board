@@ -11,15 +11,15 @@
   "theme_color": "#F4ECE0",
   "lang": "it",
   "icons": [
-    { "src": "icone/board-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "icone/board-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "icone/board-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    { "src": "board-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "board-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "board-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ],
   "shortcuts": [
-    { "name": "sero", "url": "/?apri=sero", "icons": [{ "src": "scorciatoie/sero.png", "sizes": "192x192", "type": "image/png" }] },
-    { "name": "sestante", "url": "/?apri=sestante", "icons": [{ "src": "scorciatoie/sestante.png", "sizes": "192x192", "type": "image/png" }] },
-    { "name": "folio", "url": "/?apri=folio", "icons": [{ "src": "scorciatoie/folio.png", "sizes": "192x192", "type": "image/png" }] },
-    { "name": "lare", "url": "/?apri=lare", "icons": [{ "src": "scorciatoie/lare.png", "sizes": "192x192", "type": "image/png" }] },
-    { "name": "teca", "url": "/?apri=teca", "icons": [{ "src": "scorciatoie/teca.png", "sizes": "192x192", "type": "image/png" }] }
+    { "name": "sero", "url": "/?apri=sero", "icons": [{ "src": "sero.png", "sizes": "192x192", "type": "image/png" }] },
+    { "name": "sestante", "url": "/?apri=sestante", "icons": [{ "src": "sestante.png", "sizes": "192x192", "type": "image/png" }] },
+    { "name": "folio", "url": "/?apri=folio", "icons": [{ "src": "folio.png", "sizes": "192x192", "type": "image/png" }] },
+    { "name": "lare", "url": "/?apri=lare", "icons": [{ "src": "lare.png", "sizes": "192x192", "type": "image/png" }] },
+    { "name": "teca", "url": "/?apri=teca", "icons": [{ "src": "teca.png", "sizes": "192x192", "type": "image/png" }] }
   ]
 }

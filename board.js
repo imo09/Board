@@ -1,4 +1,4 @@
-/* [board] 1.2 - come si comporta la pagina.
+/* [board] 1.3 - come si comporta la pagina.
    I contenuti (app, skill, descrizioni) stanno in index.html: per aggiungerne non serve toccare questo file. */
 (function () {
   'use strict';
@@ -14,13 +14,15 @@
     ios: 'On iPhone it opens in the browser, with separate data: the installed app opens from the Home Screen.',
     come: 'How it works', contiene: 'Contents', leggi: 'Read all', sintesi: 'Summary', copia: 'Copy text', copiato: 'Copied',
     nonCopiato: 'Copy failed', scarica: 'Download .md', carico: 'Loading', errore: 'File not reachable: try again when online.',
-    esempio: 'example', tipoSkill: 'Markdown skill', chiudi: 'Close', minuti: function (n) { return 'About ' + n + ' min read.'; }
+    esempio: 'example', tipoSkill: 'Markdown skill', chiudi: 'Close', minuti: function (n) { return 'About ' + n + ' min read.'; },
+    condividi: 'Share', tocco: 'On tap: open the app right away', chiudiAvviso: 'Close notice'
   } : {
     apri: 'Apri', notaTocco: "Oppure tocca di nuovo l'icona.", notaRapido: "Tieni premuta un'icona per rivedere questi dettagli.",
     ios: "Su iPhone si apre nel browser, con dati separati: l'app installata si apre dalla schermata Home.",
     come: 'Come funziona', contiene: 'Contiene', leggi: 'Leggi tutto', sintesi: 'Sintesi', copia: 'Copia testo', copiato: 'Copiato',
     nonCopiato: 'Copia non riuscita', scarica: 'Scarica .md', carico: 'Caricamento', errore: 'File non raggiungibile: riprova con la rete attiva.',
-    esempio: 'esempio', tipoSkill: 'skill in Markdown', chiudi: 'Chiudi', minuti: function (n) { return 'Circa ' + n + ' min di lettura.'; }
+    esempio: 'esempio', tipoSkill: 'skill in Markdown', chiudi: 'Chiudi', minuti: function (n) { return 'Circa ' + n + ' min di lettura.'; },
+    condividi: 'Condividi', tocco: "Al tocco: apri subito l'app", chiudiAvviso: 'Chiudi avviso'
   };
   var IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
@@ -31,6 +33,9 @@
 
   // Funziona anche senza rete; le skill vengono salvate appena il service worker è attivo
   if ('serviceWorker' in navigator) {
+    // Nuova versione scaricata: lo dice sw.js con un messaggio, o con il segno lasciato in cache se la pagina non era ancora pronta
+    navigator.serviceWorker.addEventListener('message', function (e) { if (e.data === 'board-novita') novita(); });
+    if (navigator.serviceWorker.controller && window.caches) caches.match('novita').then(function (r) { if (r) novita(); }, function () {});
     navigator.serviceWorker.register('sw.js').catch(function () {});
     var riscalda = function () { $$('.skill').forEach(function (s) { fetch(s.dataset.md).catch(function () {}); }); };
     if (navigator.serviceWorker.controller) setTimeout(riscalda, 1200);
@@ -42,9 +47,25 @@
   }
   if (EN) { document.documentElement.lang = 'en'; traduci(document); }
 
-  // Interruttore "Apri al primo tocco", ricordato sul dispositivo
-  var rapido = $('#rapido');
+  // Avviso di nuova versione: non ricarica da solo, per non interrompere la lettura
+  var avviso = $('#avviso');
+  $('.avviso-chiudi', avviso).setAttribute('aria-label', T.chiudiAvviso);
+  function novita() { avviso.hidden = false; }
+  avviso.addEventListener('click', function (e) {
+    if (e.target.closest('.avviso-chiudi')) avviso.hidden = true;
+    else if (e.target.closest('.avviso-testo')) location.reload();
+  });
+
+  // Interruttore "Al tocco": Dettagli (spento) o Apri (acceso). Stessa impostazione salvata del vecchio "Apri al primo tocco"
+  var rapido = $('#rapido'), scelta = rapido.parentNode;
   rapido.checked = leggi('board.rapido') === '1';
+  rapido.setAttribute('aria-label', T.tocco);
+  // col dito o col mouse vale la metà toccata, non lo scambio: toccare "Dettagli" lascia Dettagli
+  rapido.addEventListener('click', function (e) {
+    if (!e.detail) return;
+    var r = scelta.getBoundingClientRect();
+    rapido.checked = e.clientX > r.left + r.width / 2;
+  });
   rapido.addEventListener('change', function () { scrivi('board.rapido', rapido.checked ? '1' : '0'); nota(); });
 
   // Ultima app aperta: un punto sotto il nome
@@ -57,6 +78,7 @@
       pCorpo = $('.p-corpo', P), pAzioni = $('.p-azioni', P);
   var corrente = null, lettura = false, testi = {}, pronti = {};
   $('.p-chiudi', P).setAttribute('aria-label', T.chiudi);
+  $('.p-condividi', P).setAttribute('aria-label', T.condividi);
   if (history.state && history.state.pannello) history.replaceState(null, '');
 
   function mostra(v) {
@@ -87,7 +109,8 @@
     lettura = false;
     P.classList.remove('lettura');
     document.body.classList.remove('lettura');
-    pSotto.textContent = new URL(v.href).hostname;
+    var cat = v.closest('.categoria');
+    pSotto.textContent = (cat ? $('.sez-titolo', cat).textContent + ' - ' : '') + new URL(v.href).hostname;
     pCorpo.innerHTML = '';
     pCorpo.appendChild(v.parentNode.querySelector('template.info').content.cloneNode(true));
     traduci(pCorpo);
@@ -170,8 +193,43 @@
     btn._t = setTimeout(function () { btn.textContent = T.copia; }, 1600);
   }
 
+  // ---------- condividi: foglio di condivisione del telefono, altrimenti appunti ----------
+  // Nessun server: i dati passano solo dalla funzione di condivisione del dispositivo.
+  function condividi(btn) {
+    var v = corrente, nome = $('.nm', v).textContent, dati, file = null;
+    if (v.classList.contains('app')) {
+      var d = v.parentNode.querySelector('template.info').content.querySelector('.p-desc');
+      dati = { title: nome, text: nome + ' - ' + ((EN && d.getAttribute('data-en')) || d.textContent), url: v.href };
+    } else {
+      dati = { title: nome, text: nome + ' - ' + $('.sintesi', v).textContent, url: new URL('./', location.href).href };
+      var url = v.dataset.md;
+      // il file .md, se il telefono lo accetta (il testo è già scaricato all'apertura del riquadro)
+      if (pronti[url] != null && window.File && navigator.canShare) {
+        try {
+          var f = new File([pronti[url]], url.split('/').pop(), { type: 'text/markdown' });
+          if (navigator.canShare({ files: [f] })) file = { title: nome, files: [f] };
+        } catch (e) {}
+      }
+    }
+    var testo = dati.text + '\n' + dati.url;
+    var copiaTesto = function () { appunti(testo).then(function () { fatto(btn); }, function () {}); };
+    if (!navigator.share) { copiaTesto(); return; }
+    navigator.share(file || dati).catch(function (e) {
+      if (e && e.name === 'AbortError') return;                       // foglio chiuso senza scegliere: nessun errore
+      if (file) navigator.share(dati).catch(function (e2) { if (!e2 || e2.name !== 'AbortError') copiaTesto(); });   // file rifiutato: testo con link
+      else copiaTesto();
+    });
+  }
+  function fatto(btn) {
+    btn.classList.add('fatto');
+    $('.p-esito', btn).textContent = T.copiato;
+    clearTimeout(btn._t);
+    btn._t = setTimeout(function () { btn.classList.remove('fatto'); $('.p-esito', btn).textContent = ''; }, 1600);
+  }
+
   P.addEventListener('click', function (e) {
     if (e.target.closest('.p-chiudi')) chiudi();
+    else if (e.target.closest('.p-condividi')) condividi(e.target.closest('.p-condividi'));
     else if (e.target.closest('#pLeggi')) { if (lettura) sintesi(corrente); else leggiTutto(corrente); }
     else if (e.target.closest('#pCopia')) copia(e.target.closest('#pCopia'));
     else if (e.target.closest('#pApri')) aperta(corrente.dataset.id);
@@ -213,7 +271,7 @@
       }
       return;
     }
-    if (!e.target.closest('.pannello, .interruttore')) chiudi();
+    if (!e.target.closest('.pannello, .interruttore, .avviso')) chiudi();
   });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') chiudi(); });
 

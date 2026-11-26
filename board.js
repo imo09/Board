@@ -1,4 +1,4 @@
-/* [board] 1.5 - come si comporta la pagina.
+/* [board] 1.6 - come si comporta la pagina.
    I contenuti (app, skill, descrizioni) stanno in index.html: per aggiungerne non serve toccare questo file. */
 (function () {
   'use strict';
@@ -29,7 +29,7 @@
   // Scorciatoie dalla pressione lunga sull'icona di [board] (Android): ?apri=folio porta subito a folio
   var chiesta = new URLSearchParams(location.search).get('apri');
   var meta = /^[a-z]+$/.test(chiesta || '') && $('.app[data-id="' + chiesta + '"]');
-  if (meta) { scrivi('board.ultima', chiesta); location.replace(meta.href); return; }
+  if (meta) { location.replace(meta.href); return; }
 
   // Funziona anche senza rete; le skill vengono salvate appena il service worker è attivo
   if ('serviceWorker' in navigator) {
@@ -37,7 +37,7 @@
     navigator.serviceWorker.addEventListener('message', function (e) { if (e.data === 'board-novita') novita(); });
     if (navigator.serviceWorker.controller && window.caches) caches.match('novita').then(function (r) { if (r) novita(); }, function () {});
     navigator.serviceWorker.register('sw.js').catch(function () {});
-    var riscalda = function () { $$('.skill').forEach(function (s) { fetch(s.dataset.md).catch(function () {}); }); };
+    var riscalda = function () { $$('.skill').forEach(function (s) { fetch(sorgente(s)).catch(function () {}); }); };
     if (navigator.serviceWorker.controller) setTimeout(riscalda, 1200);
     else navigator.serviceWorker.addEventListener('controllerchange', function () { setTimeout(riscalda, 300); }, { once: true });
   }
@@ -67,11 +67,6 @@
     rapido.checked = e.clientX > r.left + r.width / 2;
   });
   rapido.addEventListener('change', function () { scrivi('board.rapido', rapido.checked ? '1' : '0'); nota(); });
-
-  // Ultima app aperta: un punto sotto il nome
-  function segna(id) { $$('.app').forEach(function (a) { a.classList.toggle('ultima', a.dataset.id === id); }); }
-  function aperta(id) { scrivi('board.ultima', id); segna(id); }
-  segna(leggi('board.ultima'));
 
   // ---------- riquadro dei dettagli ----------
   var P = $('#pannello'), pIco = $('.p-ico', P), pNome = $('#pNome'), pSotto = $('.p-sotto', P),
@@ -124,8 +119,8 @@
   function nota() { var n = $('#pNota'); if (n) n.textContent = rapido.checked ? T.notaRapido : T.notaTocco; }
 
   function dettagliSkill(v) {
-    // con data-zip si scarica il pacchetto completo (.zip o .skill, con istruzioni e file collegati), altrimenti il solo .md
-    var url = v.dataset.md, pacchetto = v.dataset.zip || url;
+    // si scarica il file della skill: il .skill con tutti i file collegati, oppure il solo .md
+    var pacchetto = sorgente(v);
     pSotto.innerHTML = '<span>' + esc(categoria(v) + T.tipoSkill) + '</span>' + (v.hasAttribute('data-esempio') ? '<span class="tag">' + T.esempio + '</span>' : '');
     pAzioni.innerHTML = '<button class="btn primario" id="pLeggi" type="button"></button>' +
       '<button class="btn" id="pCopia" type="button">' + T.copia + '</button>' +
@@ -141,7 +136,7 @@
     pCorpo.innerHTML = '<p class="p-desc">' + esc($('.sintesi', v).textContent) + '</p>' +
       '<h3 class="p-etichetta">' + T.contiene + '</h3><div id="pIndice" class="p-nota">' + T.carico + '</div>';
     pCorpo.scrollTop = 0;
-    carica(v.dataset.md).then(function (md) {
+    carica(sorgente(v)).then(function (md) {
       var posto = $('#pIndice');
       if (corrente !== v || lettura || !posto) return;
       var testo = corpo(md);
@@ -159,21 +154,45 @@
     $('#pLeggi').textContent = T.sintesi;
     pCorpo.innerHTML = '<div class="md p-nota">' + T.carico + '</div>';
     pCorpo.scrollTop = 0;
-    carica(v.dataset.md).then(function (md) {
+    carica(sorgente(v)).then(function (md) {
       if (corrente === v && lettura) { pCorpo.firstChild.className = 'md'; pCorpo.firstChild.innerHTML = rendi(md); }
     }, function () { if (corrente === v && lettura) pCorpo.firstChild.textContent = T.errore; });
   }
 
+  // Una skill è un solo file: .skill (zip) da cui si legge SKILL.md, oppure un .md
+  function sorgente(v) { return v.dataset.skill || v.dataset.md; }
   function carica(url) {
     if (!testi[url]) {
-      testi[url] = fetch(url).then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); });
+      testi[url] = fetch(url).then(function (r) {
+        if (!r.ok) throw new Error(r.status);
+        return /\.(skill|zip)$/i.test(url) ? r.arrayBuffer().then(leggiSkill) : r.text();
+      });
       testi[url].then(function (t) { pronti[url] = t; }, function () { delete testi[url]; });
     }
     return testi[url];
   }
 
+  // Legge nome/SKILL.md dall'archivio: salvato senza compressione si legge subito, compresso serve DecompressionStream
+  function leggiSkill(buf) {
+    var d = new DataView(buf), u8 = new Uint8Array(buf), testo = function (b) { return new TextDecoder().decode(b); }, i, k;
+    for (i = buf.byteLength - 22; i >= 0 && d.getUint32(i, true) !== 0x06054b50; i--);
+    if (i < 0) throw new Error('zip');
+    for (k = d.getUint16(i + 10, true), i = d.getUint32(i + 16, true); k > 0; k--) {
+      var metodo = d.getUint16(i + 10, true), dim = d.getUint32(i + 20, true), ln = d.getUint16(i + 28, true),
+          loc = d.getUint32(i + 42, true), nome = testo(u8.subarray(i + 46, i + 46 + ln));
+      if (/^([^\/]+\/)?SKILL\.md$/.test(nome)) {
+        var inizio = loc + 30 + d.getUint16(loc + 26, true) + d.getUint16(loc + 28, true), dati = u8.subarray(inizio, inizio + dim);
+        if (metodo === 0) return testo(dati);
+        if (metodo === 8 && window.DecompressionStream) return new Response(new Blob([dati]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).text();
+        throw new Error('compressione');
+      }
+      i += 46 + ln + d.getUint16(i + 30, true) + d.getUint16(i + 32, true);
+    }
+    throw new Error('SKILL.md');
+  }
+
   function copia(btn) {
-    var url = corrente.dataset.md;
+    var url = sorgente(corrente);
     var fatto = function () { esito(btn, T.copiato); }, fallito = function () { esito(btn, T.nonCopiato); };
     // il testo è già scaricato all'apertura del riquadro: la copia parte subito, dentro il tocco
     if (pronti[url] != null) appunti(pronti[url]).then(fatto, fallito);
@@ -203,11 +222,11 @@
       dati = { title: nome, text: nome + ' - ' + ((EN && d.getAttribute('data-en')) || d.textContent), url: v.href };
     } else {
       dati = { title: nome, text: nome + ' - ' + $('.sintesi', v).textContent, url: new URL('./', location.href).href };
-      var url = v.dataset.md;
-      // il file .md, se il telefono lo accetta (il testo è già scaricato all'apertura del riquadro)
+      var url = sorgente(v);
+      // il testo come file .md, se il telefono lo accetta (è già scaricato all'apertura del riquadro)
       if (pronti[url] != null && window.File && navigator.canShare) {
         try {
-          var f = new File([pronti[url]], url.split('/').pop(), { type: 'text/markdown' });
+          var f = new File([pronti[url]], v.dataset.id + '.md', { type: 'text/markdown' });
           if (navigator.canShare({ files: [f] })) file = { title: nome, files: [f] };
         } catch (e) {}
       }
@@ -233,7 +252,6 @@
     else if (e.target.closest('.p-condividi')) condividi(e.target.closest('.p-condividi'));
     else if (e.target.closest('#pLeggi')) { if (lettura) sintesi(corrente); else leggiTutto(corrente); }
     else if (e.target.closest('#pCopia')) copia(e.target.closest('#pCopia'));
-    else if (e.target.closest('#pApri')) aperta(corrente.dataset.id);
   });
 
   // ---------- tocchi ----------
@@ -265,7 +283,7 @@
     var v = e.target.closest('.voce');
     if (v) {
       if (v.classList.contains('app')) {
-        if (rapido.checked || corrente === v || e.ctrlKey || e.metaKey || e.shiftKey) { aperta(v.dataset.id); return; }
+        if (rapido.checked || corrente === v || e.ctrlKey || e.metaKey || e.shiftKey) return;
         e.preventDefault();
         mostra(v);
       } else if (corrente === v) {

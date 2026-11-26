@@ -1,7 +1,7 @@
 // board: si apre subito dalla copia salvata e intanto scarica quella nuova.
 // Se index.html, board.js o il manifest scaricati sono diversi da quelli salvati, avvisa la pagina:
 // la novità si vede con un tocco, senza aspettare l'apertura successiva.
-const CACHE = 'board-6';
+const CACHE = 'board-7';
 const FILE = ['./', 'board.js', 'manifest.webmanifest', 'board-180.png', 'board-192.png', 'board-512.png'];
 const CONTROLLA = ['./', 'board.js', 'manifest.webmanifest'];
 const NOVITA = 'novita';   // segno salvato in cache: la copia salvata è più nuova della pagina aperta

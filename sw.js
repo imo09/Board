@@ -1,7 +1,7 @@
 // board: si apre subito dalla copia salvata e intanto scarica quella nuova.
 // Se index.html, board.js o il manifest scaricati sono diversi da quelli salvati, avvisa la pagina:
 // la novità si vede con un tocco, senza aspettare l'apertura successiva.
-const CACHE = 'board-5';
+const CACHE = 'board-6';
 const FILE = ['./', 'board.js', 'manifest.webmanifest', 'board-180.png', 'board-192.png', 'board-512.png'];
 const CONTROLLA = ['./', 'board.js', 'manifest.webmanifest'];
 const NOVITA = 'novita';   // segno salvato in cache: la copia salvata è più nuova della pagina aperta
@@ -29,7 +29,8 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const r = e.request;
   if (r.method !== 'GET' || new URL(r.url).origin !== location.origin) return;
-  const nav = r.mode === 'navigate';
+  // solo la pagina va sotto la chiave './': un download (.zip, .md) resta il suo file
+  const nav = r.mode === 'navigate' && /\/(index\.html)?$/.test(new URL(r.url).pathname);
   const chiave = nav ? './' : r;
   const conta = nav || CONTROLLA.map(indirizzo).includes(r.url.split('?')[0]);
   // una pagina appena aperta prende la copia salvata, che è già la più nuova: il segno non serve più

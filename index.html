@@ -39,7 +39,7 @@ button{font:inherit;color:inherit}
 .colonna{width:100%;max-width:520px;margin:0 auto;flex:1;display:flex;flex-direction:column}
 
 /* barra: nautargo a sinistra, [board] al centro */
-header{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:44px}
+header{display:grid;grid-template-columns:minmax(max-content,1fr) auto 1fr;column-gap:12px;align-items:center;height:44px}
 .nautargo{display:flex;align-items:center;gap:10px}
 .nautargo svg{width:22px;height:34px;display:block;flex:none}
 .marchio{font-family:var(--marchio);font-weight:600;font-size:23px;letter-spacing:-.01em;line-height:1}
@@ -51,6 +51,7 @@ header{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height
 .categoria{margin-top:22px}
 .categoria:first-of-type{margin-top:14px}
 .categoria .sez-titolo{margin-bottom:12px}
+.categoria .elenco{margin-top:18px}
 .sez-testa{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:32px;margin-bottom:14px}
 .sez-titolo{font-family:var(--marchio);font-weight:600;font-size:15px;line-height:1;color:var(--tenue)}
 
@@ -86,7 +87,8 @@ header{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height
 .app.ultima::after{background:var(--accento)}
 .app .ico{width:min(68px,100%);aspect-ratio:1;border-radius:23%;overflow:hidden;box-shadow:var(--ombra),0 0 0 1px var(--bordo);
   transition:transform .14s ease,box-shadow .14s ease}
-.ico svg{width:100%;height:100%;display:block}
+.ico svg,.ico img{width:100%;height:100%;display:block}
+.ico img,.p-ico img{-webkit-user-drag:none;user-select:none}
 .app:active .ico{transform:scale(.93)}
 .app[aria-expanded="true"] .ico,.app:focus-visible .ico{box-shadow:0 0 0 3px var(--carta),0 0 0 5px var(--accento)}
 @media (hover:hover){.app:hover .ico{transform:translateY(-2px)}}
@@ -116,7 +118,7 @@ footer a{text-underline-offset:3px}
 .pannello.lettura{height:calc(100dvh - env(safe-area-inset-top) - 18px);max-height:none}
 .p-testa{display:flex;align-items:center;gap:12px;padding:16px 10px 12px 18px}
 .p-ico{width:44px;height:44px;flex:none;border-radius:12px;overflow:hidden;display:grid;place-items:center;background:var(--carta)}
-.p-ico svg{width:100%;height:100%;display:block}
+.p-ico svg,.p-ico img{width:100%;height:100%;display:block}
 .p-ico.skill-ico svg{width:24px;height:24px}
 .p-titoli{min-width:0;flex:1}
 .p-nome{font-family:var(--marchio);font-weight:600;font-size:20px;line-height:1.15;letter-spacing:-.01em;overflow-wrap:anywhere}
@@ -165,18 +167,25 @@ footer a{text-underline-offset:3px}
 @media (min-width:760px){
   body{padding-top:48px;transition:padding-right .26s}
   body.aperto:not(.lettura){padding-right:416px}
-  .app .ico{width:76px}
+  .app .ico{width:min(76px,100%)}
+  /* tablet e computer: le categorie si affiancano, due o più colonne secondo lo spazio (anche con il riquadro aperto) */
+  .colonna{max-width:760px}
+  main{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(340px,100%),1fr));gap:30px 44px;align-items:start}
+  main>.interruttore{grid-column:1/-1;margin-bottom:-12px}
+  .categoria,.categoria:first-of-type{margin-top:0}
   .pannello{left:auto;top:0;width:400px;max-height:none;border-radius:0;transform:translateX(105%);
     box-shadow:-1px 0 0 var(--bordo),-12px 0 40px rgba(0,0,0,.12);padding-top:env(safe-area-inset-top)}
   .pannello.lettura{width:min(640px,100vw - 120px);height:auto}
   .p-testa{padding-top:22px}
 }
+@media (min-width:1180px){.colonna{max-width:1160px}}
+@media (min-width:1600px){.colonna{max-width:1500px}}
 /* telefoni: la barra si stringe perché [board] resti al centro senza toccare nautargo */
 @media (max-width:409px){.marchio{font-size:21px} .nautargo{gap:9px} .nautargo svg{width:20px;height:31px} .titolo{font-size:16px}}
 @media (max-width:374px){.marchio{font-size:18px} .nautargo{gap:7px} .nautargo svg{width:18px;height:28px} .titolo{font-size:15px}
   .interruttore{font-size:12px;gap:8px} .pos{padding:5px 10px 6px;font-size:12.5px}}
 @media (max-width:339px){.marchio{font-size:17px} .nautargo{gap:6px} .nautargo svg{width:16px;height:25px} .titolo{font-size:14px}
-  .griglia{grid-template-columns:repeat(3,1fr)}}
+  .griglia{gap:18px 6px} .app .nm{font-size:13.5px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -222,13 +231,14 @@ footer a{text-underline-offset:3px}
   </span>
 </div>
 
-<!-- ============ APP ============
+<!-- ============ APP E SKILL ============
      Una <section class="categoria"> per categoria, nell'ordine in cui compaiono: titolo nell'<h2> (data-en = testo inglese).
-     Una categoria senza app non si scrive. Per aggiungere un'app copia un blocco <li> dentro la categoria giusta:
-     data-id (nome breve, solo lettere minuscole), indirizzo, icona, nome e, nel <template class="info">,
-     la descrizione e i punti di "Come funziona" (data-en = testo inglese). -->
+     Dentro: <ul class="griglia"> con le app e, se ci sono, <ul class="elenco"> con le skill. Una categoria vuota non si scrive.
+     App: copia un blocco <li> nella griglia della categoria giusta; data-id (nome breve, solo lettere minuscole), indirizzo,
+     icona (PNG 192 x 192 nella radice, oppure SVG), nome e, nel <template class="info">, descrizione e punti di "Come funziona".
+     Skill: copia un blocco <li> nell'elenco; data-md = file .md da leggere, data-zip (facoltativo) = pacchetto completo da scaricare. -->
 <section class="sezione categoria">
-  <h2 class="sez-titolo" data-en="Travel">Viaggi</h2>
+  <h2 class="sez-titolo" data-en="Travel and the unexpected">Viaggi e imprevisti</h2>
   <ul class="griglia">
 
     <li><a class="voce app" data-id="sero" href="https://sero.nautargo.com/" aria-controls="pannello" aria-expanded="false">
@@ -248,6 +258,43 @@ footer a{text-underline-offset:3px}
         </ul>
       </template>
     </li>
+
+    <li><a class="voce app" data-id="nembo" href="https://nembo.nautargo.com/" aria-controls="pannello" aria-expanded="false">
+      <span class="ico"><img src="nembo.png" alt="" width="192" height="192" draggable="false"></span>
+      <span class="nm">nembo</span></a>
+      <template class="info">
+        <p class="p-desc" data-en="What the weather is, and what it was.">Che tempo fa, e che tempo ha fatto.</p>
+        <ul>
+          <li data-en="A 14-day forecast, with how reliable each hour and each day is.">Previsioni a 14 giorni, con l'attendibilità di ogni ora e di ogni giorno.</li>
+          <li data-en="Past weather since 1940 and a report card for the forecasts.">Il tempo passato dal 1940 e la pagella delle previsioni.</li>
+          <li data-en="Civil Protection alerts and air quality, on open data and with no account.">Allerte della Protezione Civile e qualità dell'aria, su dati aperti e senza account.</li>
+        </ul>
+      </template>
+    </li>
+
+    <li><a class="voce app" data-id="kit" href="https://kit.nautargo.com/" aria-controls="pannello" aria-expanded="false">
+      <span class="ico"><img src="kit.png" alt="" width="192" height="192" draggable="false"></span>
+      <span class="nm">kit</span></a>
+      <template class="info">
+        <p class="p-desc" data-en="What to do, who to call, what covers you.">Cosa fare, chi chiamare, cosa ti copre.</p>
+        <ul>
+          <li data-en="Step-by-step cards for breakdowns, accidents, sudden illness and damage at home.">Schede passo per passo per guasti, incidenti, malori e danni in casa.</li>
+          <li data-en="Policies, vehicles and emergency contacts: each situation shows the right numbers and cover.">Polizze, veicoli e contatti di emergenza: per ogni situazione vedi numeri e coperture giuste.</li>
+          <li data-en="Health card and documents, in an archive on your device.">Scheda sanitaria e documenti, in un archivio sul tuo dispositivo.</li>
+        </ul>
+      </template>
+    </li>
+
+  </ul>
+  <ul class="elenco">
+
+    <li><button class="voce skill" type="button" data-id="itinerario-integrato" data-md="istruzioni-itinerario-integrato.md" data-zip="itinerario-integrato.zip" aria-controls="pannello" aria-expanded="false">
+      <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 3.5h7l4 4v13h-11z"/><path d="M13.5 3.5v4h4"/><path d="M9.5 12.5h5M9.5 16h5" style="stroke:var(--accento)"/></svg></span>
+      <span class="testo">
+        <span class="riga"><span class="nm">itinerario-integrato</span></span>
+        <span class="sintesi" data-en="Builds, in a short chat, one HTML file with your trip: daily maps, calendar, costs and alternatives.">Crea con una breve conversazione un file HTML con l'itinerario: mappe dei giorni, calendario, costi e alternative.</span>
+      </span>
+    </button></li>
 
   </ul>
 </section>
@@ -294,6 +341,17 @@ footer a{text-underline-offset:3px}
     </li>
 
   </ul>
+  <ul class="elenco">
+
+    <li><button class="voce skill" type="button" data-id="lente" data-md="lente-istruzioni.md" data-zip="lente.zip" aria-controls="pannello" aria-expanded="false">
+      <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 3.5h7l4 4v13h-11z"/><path d="M13.5 3.5v4h4"/><path d="M9.5 12.5h5M9.5 16h5" style="stroke:var(--accento)"/></svg></span>
+      <span class="testo">
+        <span class="riga"><span class="nm">lente</span></span>
+        <span class="sintesi" data-en="Turns payslip PDFs into one simple phone page that grows month by month.">Trasforma i PDF dei cedolini in una pagina semplice da telefono, che cresce mese dopo mese.</span>
+      </span>
+    </button></li>
+
+  </ul>
 </section>
 
 <section class="sezione categoria">
@@ -333,40 +391,84 @@ footer a{text-underline-offset:3px}
       </template>
     </li>
 
+    <li><a class="voce app" data-id="plico" href="https://plico.nautargo.com/" aria-controls="pannello" aria-expanded="false">
+      <span class="ico"><img src="plico.png" alt="" width="192" height="192" draggable="false"></span>
+      <span class="nm">plico</span></a>
+      <template class="info">
+        <p class="p-desc" data-en="Read PDFs and write on them by hand.">Leggi i PDF e scrivici sopra a mano.</p>
+        <ul>
+          <li data-en="PDFs reach your library, also through Share from other apps.">I PDF entrano in libreria anche con Condividi, dalle altre app.</li>
+          <li data-en="Pen and highlighter by hand, also snapped to the text.">Penna ed evidenziatore a mano, anche agganciato al testo.</li>
+          <li data-en="Notes are saved in the PDF itself, on your device.">Le note si salvano nel PDF stesso, sul tuo dispositivo.</li>
+        </ul>
+      </template>
+    </li>
+
   </ul>
 </section>
 
-<!-- ============ SKILL ============
-     Un blocco <li> per skill: data-id, data-md (il file .md nella cartella skill), nome e sintesi.
-     data-esempio segna le skill di esempio; toglilo dalle skill vere. -->
-<section class="sezione" aria-labelledby="titoloSkill">
-  <div class="sez-testa">
-    <h2 class="sez-titolo" id="titoloSkill">skill</h2>
-  </div>
-  <ul class="elenco">
+<section class="sezione categoria">
+  <h2 class="sez-titolo" data-en="Productivity">Produttività</h2>
+  <ul class="griglia">
 
-    <li><button class="voce skill" type="button" data-id="pubblica-webapp" data-md="pubblica-webapp.md" data-esempio aria-controls="pannello" aria-expanded="false">
-      <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 3.5h7l4 4v13h-11z"/><path d="M13.5 3.5v4h4"/><path d="M9.5 12.5h5M9.5 16h5" style="stroke:var(--accento)"/></svg></span>
-      <span class="testo">
-        <span class="riga"><span class="nm">pubblica-webapp</span><span class="tag" data-en="example">esempio</span></span>
-        <span class="sintesi" data-en="Puts a new nautargo app online on its own subdomain, with GitHub Pages and Aruba DNS.">Mette online una nuova app nautargo sul suo sottodominio, con GitHub Pages e il DNS di Aruba.</span>
-      </span>
-    </button></li>
+    <li><a class="voce app" data-id="hora" href="https://hora.nautargo.com/" aria-controls="pannello" aria-expanded="false">
+      <span class="ico"><img src="hora.png" alt="" width="192" height="192" draggable="false"></span>
+      <span class="nm">hora</span></a>
+      <template class="info">
+        <p class="p-desc" data-en="A calm calendar that stays on your device.">Un calendario calmo, che resta sul tuo dispositivo.</p>
+        <ul>
+          <li data-en="Events, reminders, alarms and tasks, sorted by category.">Eventi, promemoria, sveglie e attività, divisi per categoria.</li>
+          <li data-en="Add things by hand, by voice or from Claude.">Si inserisce a mano, a voce o da Claude.</li>
+          <li data-en="Repeats and alerts before each appointment.">Ripetizioni e avvisi prima di ogni impegno.</li>
+        </ul>
+      </template>
+    </li>
 
-    <li><button class="voce skill" type="button" data-id="voce-nautargo" data-md="voce-nautargo.md" data-esempio aria-controls="pannello" aria-expanded="false">
-      <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 3.5h7l4 4v13h-11z"/><path d="M13.5 3.5v4h4"/><path d="M9.5 12.5h5M9.5 16h5" style="stroke:var(--accento)"/></svg></span>
-      <span class="testo">
-        <span class="riga"><span class="nm">voce-nautargo</span><span class="tag" data-en="example">esempio</span></span>
-        <span class="sintesi" data-en="Writes copy in the nautargo voice: few things, said clearly.">Scrive testi con il tono di nautargo: poche cose, dette con chiarezza.</span>
-      </span>
-    </button></li>
+    <li><a class="voce app" data-id="iris" href="https://iris.nautargo.com/" aria-controls="pannello" aria-expanded="false">
+      <span class="ico"><img src="iris.png" alt="" width="192" height="192" draggable="false"></span>
+      <span class="nm">iris</span></a>
+      <template class="info">
+        <p class="p-desc" data-en="A simple whiteboard to think together.">Una lavagna semplice per pensare insieme.</p>
+        <ul>
+          <li data-en="Sticky notes, shapes, connectors and frames.">Post-it, forme, connettori e cornici.</li>
+          <li data-en="Made for working with others on the same board.">Pensata per lavorare con altri sulla stessa lavagna.</li>
+          <li data-en="Light and dark theme, i icons and a built-in guide.">Tema chiaro e scuro, icone i e guida integrata.</li>
+        </ul>
+      </template>
+    </li>
+
+    <li><a class="voce app" data-id="zeno" href="https://zeno.nautargo.com/" aria-controls="pannello" aria-expanded="false">
+      <span class="ico"><img src="zeno.png" alt="" width="192" height="192" draggable="false"></span>
+      <span class="nm">zeno</span></a>
+      <template class="info">
+        <p class="p-desc" data-en="Simple work boards to share with a few collaborators.">Board di lavoro semplici, da condividere con pochi collaboratori.</p>
+        <ul>
+          <li data-en="Table, kanban and timeline views.">Viste tabella, kanban e timeline.</li>
+          <li data-en="Owner column and filter, activity log.">Colonna e filtro per responsabile, registro delle attività.</li>
+          <li data-en="Light and dark theme, i icons and a built-in guide.">Tema chiaro e scuro, icone i e guida integrata.</li>
+        </ul>
+      </template>
+    </li>
+
+    <li><a class="voce app" data-id="meridian" href="https://meridian.nautargo.com/" aria-controls="pannello" aria-expanded="false">
+      <span class="ico"><img src="meridian.png" alt="" width="192" height="192" draggable="false"></span>
+      <span class="nm">meridian</span></a>
+      <template class="info">
+        <p class="p-desc" data-en="Project planning and control with the logic of Primavera P6.">Pianificazione e controllo di progetti con la logica di Primavera P6.</p>
+        <ul>
+          <li data-en="Activities, Gantt and network, with multiple critical paths and preview rescheduling.">Attività, Gantt e reticolo, con percorsi critici multipli e ricalcolo in anteprima.</li>
+          <li data-en="Costs, baselines and Earned Value, with 14 quality checks on the DCMA model.">Costi, baseline ed Earned Value, con 14 controlli di qualità sul modello DCMA.</li>
+          <li data-en="Exchange with P6 and MS Project (XER and XML), Excel and PDF.">Scambio con P6 e MS Project (XER e XML), Excel e PDF.</li>
+        </ul>
+      </template>
+    </li>
 
   </ul>
 </section>
 
 </main>
 
-<footer>[board] 1.3 - <a href="https://nautargo.com/">nautargo.com</a></footer>
+<footer>[board] 1.4 - <a href="https://nautargo.com/">nautargo.com</a></footer>
 
 </div>
 

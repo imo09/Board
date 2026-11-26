@@ -1,4 +1,4 @@
-/* [board] 1.3 - come si comporta la pagina.
+/* [board] 1.4 - come si comporta la pagina.
    I contenuti (app, skill, descrizioni) stanno in index.html: per aggiungerne non serve toccare questo file. */
 (function () {
   'use strict';
@@ -13,14 +13,14 @@
     apri: 'Open', notaTocco: 'Or tap the icon again.', notaRapido: 'Press and hold an icon to see these details again.',
     ios: 'On iPhone it opens in the browser, with separate data: the installed app opens from the Home Screen.',
     come: 'How it works', contiene: 'Contents', leggi: 'Read all', sintesi: 'Summary', copia: 'Copy text', copiato: 'Copied',
-    nonCopiato: 'Copy failed', scarica: 'Download .md', carico: 'Loading', errore: 'File not reachable: try again when online.',
+    nonCopiato: 'Copy failed', scarica: 'Download .md', scaricaZip: 'Download .zip', carico: 'Loading', errore: 'File not reachable: try again when online.',
     esempio: 'example', tipoSkill: 'Markdown skill', chiudi: 'Close', minuti: function (n) { return 'About ' + n + ' min read.'; },
     condividi: 'Share', tocco: 'On tap: open the app right away', chiudiAvviso: 'Close notice'
   } : {
     apri: 'Apri', notaTocco: "Oppure tocca di nuovo l'icona.", notaRapido: "Tieni premuta un'icona per rivedere questi dettagli.",
     ios: "Su iPhone si apre nel browser, con dati separati: l'app installata si apre dalla schermata Home.",
     come: 'Come funziona', contiene: 'Contiene', leggi: 'Leggi tutto', sintesi: 'Sintesi', copia: 'Copia testo', copiato: 'Copiato',
-    nonCopiato: 'Copia non riuscita', scarica: 'Scarica .md', carico: 'Caricamento', errore: 'File non raggiungibile: riprova con la rete attiva.',
+    nonCopiato: 'Copia non riuscita', scarica: 'Scarica .md', scaricaZip: 'Scarica .zip', carico: 'Caricamento', errore: 'File non raggiungibile: riprova con la rete attiva.',
     esempio: 'esempio', tipoSkill: 'skill in Markdown', chiudi: 'Chiudi', minuti: function (n) { return 'Circa ' + n + ' min di lettura.'; },
     condividi: 'Condividi', tocco: "Al tocco: apri subito l'app", chiudiAvviso: 'Chiudi avviso'
   };
@@ -109,8 +109,7 @@
     lettura = false;
     P.classList.remove('lettura');
     document.body.classList.remove('lettura');
-    var cat = v.closest('.categoria');
-    pSotto.textContent = (cat ? $('.sez-titolo', cat).textContent + ' - ' : '') + new URL(v.href).hostname;
+    pSotto.textContent = categoria(v) + new URL(v.href).hostname;
     pCorpo.innerHTML = '';
     pCorpo.appendChild(v.parentNode.querySelector('template.info').content.cloneNode(true));
     traduci(pCorpo);
@@ -121,14 +120,16 @@
     nota();
     pCorpo.scrollTop = 0;
   }
+  function categoria(v) { var cat = v.closest('.categoria'); return cat ? $('.sez-titolo', cat).textContent + ' - ' : ''; }
   function nota() { var n = $('#pNota'); if (n) n.textContent = rapido.checked ? T.notaRapido : T.notaTocco; }
 
   function dettagliSkill(v) {
-    var url = v.dataset.md;
-    pSotto.innerHTML = '<span>' + T.tipoSkill + '</span>' + (v.hasAttribute('data-esempio') ? '<span class="tag">' + T.esempio + '</span>' : '');
+    // con data-zip si scarica il pacchetto completo (istruzioni e file collegati), altrimenti il solo .md
+    var url = v.dataset.md, pacchetto = v.dataset.zip || url;
+    pSotto.innerHTML = '<span>' + esc(categoria(v) + T.tipoSkill) + '</span>' + (v.hasAttribute('data-esempio') ? '<span class="tag">' + T.esempio + '</span>' : '');
     pAzioni.innerHTML = '<button class="btn primario" id="pLeggi" type="button"></button>' +
       '<button class="btn" id="pCopia" type="button">' + T.copia + '</button>' +
-      '<a class="btn" id="pScarica" href="' + esc(url) + '" download="' + esc(url.split('/').pop()) + '">' + T.scarica + '</a>';
+      '<a class="btn" id="pScarica" href="' + esc(pacchetto) + '" download="' + esc(pacchetto.split('/').pop()) + '">' + (v.dataset.zip ? T.scaricaZip : T.scarica) + '</a>';
     sintesi(v);
   }
 
@@ -256,10 +257,13 @@
     if (!lungo) mostra(v);
   });
 
+  // il rilascio dopo una pressione lunga non vale come tocco, anche se cade sul riquadro appena aperto (per esempio su Apri)
+  document.addEventListener('click', function (e) {
+    if (lungo) { lungo = false; e.preventDefault(); e.stopPropagation(); }
+  }, true);
   document.addEventListener('click', function (e) {
     var v = e.target.closest('.voce');
     if (v) {
-      if (lungo) { e.preventDefault(); lungo = false; return; }
       if (v.classList.contains('app')) {
         if (rapido.checked || corrente === v || e.ctrlKey || e.metaKey || e.shiftKey) { aperta(v.dataset.id); return; }
         e.preventDefault();
